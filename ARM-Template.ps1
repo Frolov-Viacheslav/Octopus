@@ -9,7 +9,9 @@ param (
     [String] $KeyVaultSecretInstrumentationKey = "InstrumentationKey",
     [String] $KeyVaultSecretConnectionString = "ConnectionStringToApplicationInsight",
     [String] $octopusAccountIdOrName = "Azure",
-    [String] $octopusRoles = "web"
+    [String] $octopusRoles = "web",
+    [String] $appSettings = '[]',
+    [String] $connectionStrings = '[]'
 
 )
 

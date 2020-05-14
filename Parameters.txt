@@ -1,0 +1,18 @@
+-webAppName "#{webAppName}" `
+-sku "#{sku}" `
+-location "#{location}" `
+-ResourceGroupName "#{ResourceGroupName}" `
+-KeyVaultName "#{KeyVaultName}" `
+-TemplateFile "#{TemplateFile}" `
+-KeyVaultSecretInstrumentationKey "#{KeyVaultSecretInstrumentationKey}" `
+-KeyVaultSecretConnectionString "#{KeyVaultSecretConnectionString}" `
+-octopusAccountIdOrName "#{octopusAccountIdOrName}" `
+-octopusRoles "#{octopusRoles}" `
+-appSettings "#{appSettings}" `
+-connectionStrings "#{connectionStrings}"
+
+-webAppName "#{webAppName}" `
+-ResourceGroupName "#{ResourceGroupName}" `
+-KeyVaultName "#{KeyVaultName}" `
+-KeyVaultSecretInstrumentationKey "#{KeyVaultSecretInstrumentationKey}" `
+-KeyVaultSecretConnectionString "#{KeyVaultSecretConnectionString}"

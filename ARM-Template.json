@@ -22,6 +22,12 @@
         "metadata": {
           "description": "Location for all resources"
         }
+      },
+      "appSettings": {
+        "type": "array"
+      },
+      "connectionStrings": {
+        "type": "array"
       }
     },
     "variables": {
@@ -52,11 +58,16 @@
           "type": "SystemAssigned"
         },
         "properties": {
-          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+          "siteConfig": {
+          "appSettings": "[parameters('appSettings')]",
+          "connectionStrings": "[parameters('connectionStrings')]"
+          }
         },
         "dependsOn": [
           "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
         ]
+        
       },
       {
           "apiVersion": "2014-08-01",
@@ -64,7 +75,7 @@
           "type": "microsoft.insights/components",
           "location": "[parameters('location')]",
           "properties": {}
-      }   
+      }  
     ]
     
     
