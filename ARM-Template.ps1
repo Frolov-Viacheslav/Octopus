@@ -3,7 +3,8 @@ param (
     [String] $webAppName = "viacheslav-frolov",
     [String] $sku = "S1",
     [String] $location = "West US",
-    [String] $ResourceGroupName = "SKILLUP-RG"
+    [String] $ResourceGroupName = "SKILLUP-RG",
+    [String] $KeyVaultName = "kv-viacheslav-frolov"
 )
 
 $Parameters = @{}
@@ -18,8 +19,8 @@ $ApplicationInsightName = "AppInsight-" + $webAppName
 $ApplicationInsight = Get-AzApplicationInsights -ResourceGroupName $ResourceGroupName -Name $ApplicationInsightName
 $InstrumentationKey = ConvertTo-SecureString -String $ApplicationInsight.InstrumentationKey -AsPlainText -Force
 $ConnectionString = ConvertTo-SecureString -String ("InstrumentationKey=" + $ApplicationInsight.InstrumentationKey) -AsPlainText -Force
-Set-AzKeyVaultSecret -VaultName 'kv-viacheslav-frolov' -Name 'InstrumentationKey' -SecretValue $InstrumentationKey
-Set-AzKeyVaultSecret -VaultName 'kv-viacheslav-frolov' -Name 'ConnectionStringToApplicationInsight' -SecretValue $ConnectionString
+Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name 'InstrumentationKey' -SecretValue $InstrumentationKey
+Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name 'ConnectionStringToApplicationInsight' -SecretValue $ConnectionString
 
 $WebAppName = $webAppName + "-webapp"
 New-OctopusAzureWebAppTarget -name "Azure Web Application" `
@@ -28,3 +29,24 @@ New-OctopusAzureWebAppTarget -name "Azure Web Application" `
                              -octopusAccountIdOrName "Azure" `
                              -octopusRoles "web" `
                              -updateIfExisting
+
+#Remove Role Assignment
+$KeyVaultID = (Get-AzKeyVault -Name $KeyVaultName).ResourceId
+$RoleAssignment = Get-AzRoleAssignment -Scope $KeyVaultID
+$Unknown = $RoleAssignment | Where-Object{$_.ObjectType -eq "Unknown"}
+Remove-AzRoleAssignment -ObjectId $Unknown.ObjectId -RoleDefinitionName $Unknown.RoleDefinitionName -Scope $KeyVaultID
+
+#Remove Access Policy
+$AccessPolicies = (Get-AzKeyVault -Name $KeyVaultName).AccessPolicies
+$ObjectId = ($AccessPolicies | Where-Object{$_.DisplayName -eq ""}).ObjectId
+Remove-AzKeyVaultAccessPolicy -VaultName $KeyVaultName -ObjectId $ObjectId
+
+#New Role Assignment
+$WebAppId = (Get-AzWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName).Identity.PrincipalId
+New-AzRoleAssignment -ObjectId $WebAppId -RoleDefinitionName "Reader" -Scope $KeyVaultID
+
+#New Access Policy
+Set-AzKeyVaultAccessPolicy -VaultName $KeyVaultName -ObjectId $WebAppId -PermissionsToSecrets Get
+
+#Restart Web App
+Restart-AzWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName
