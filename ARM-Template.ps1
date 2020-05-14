@@ -34,12 +34,16 @@ New-OctopusAzureWebAppTarget -name "Azure Web Application" `
 $KeyVaultID = (Get-AzKeyVault -Name $KeyVaultName).ResourceId
 $RoleAssignment = Get-AzRoleAssignment -Scope $KeyVaultID
 $Unknown = $RoleAssignment | Where-Object{$_.ObjectType -eq "Unknown"}
-Remove-AzRoleAssignment -ObjectId $Unknown.ObjectId -RoleDefinitionName $Unknown.RoleDefinitionName -Scope $KeyVaultID
+if($Unknown){
+    Remove-AzRoleAssignment -ObjectId $Unknown.ObjectId -RoleDefinitionName $Unknown.RoleDefinitionName -Scope $KeyVaultID
+}
 
 #Remove Access Policy
 $AccessPolicies = (Get-AzKeyVault -Name $KeyVaultName).AccessPolicies
 $ObjectId = ($AccessPolicies | Where-Object{$_.DisplayName -eq ""}).ObjectId
-Remove-AzKeyVaultAccessPolicy -VaultName $KeyVaultName -ObjectId $ObjectId
+if($ObjectId){
+    Remove-AzKeyVaultAccessPolicy -VaultName $KeyVaultName -ObjectId $ObjectId
+}
 
 #New Role Assignment
 $WebAppId = (Get-AzWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName).Identity.PrincipalId
