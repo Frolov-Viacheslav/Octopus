@@ -24,10 +24,10 @@
         }
       },
       "appSettings": {
-        "type": "array"
+        "type": "object"
       },
       "connectionStrings": {
-        "type": "array"
+        "type": "object"
       }
     },
     "variables": {
