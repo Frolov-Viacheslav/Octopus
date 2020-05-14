@@ -19,8 +19,8 @@ $Parameters = @{}
 $Parameters["webAppName"] = $webAppName
 $Parameters["sku"] = $sku
 $Parameters["location"] = $location
-$Parameters["appSettings"] = $appSettings
-$Parameters["connectionStrings"] = $connectionStrings
+$Parameters["appSettings"] = $appSettings | ConvertFrom-Json
+$Parameters["connectionStrings"] = $connectionStrings | ConvertFrom-Json
 
 New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $TemplateFile -TemplateParameterObject $Parameters
 
