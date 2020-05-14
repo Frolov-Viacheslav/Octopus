@@ -4,7 +4,13 @@ param (
     [String] $sku = "S1",
     [String] $location = "West US",
     [String] $ResourceGroupName = "SKILLUP-RG",
-    [String] $KeyVaultName = "kv-viacheslav-frolov"
+    [String] $KeyVaultName = "kv-viacheslav-frolov",
+    [String] $TemplateFile = ".\ARM-Template.json",
+    [String] $KeyVaultSecretInstrumentationKey = "InstrumentationKey",
+    [String] $KeyVaultSecretConnectionString = "ConnectionStringToApplicationInsight",
+    [String] $octopusAccountIdOrName = "Azure",
+    [String] $octopusRoles = "web"
+
 )
 
 $Parameters = @{}
@@ -13,21 +19,21 @@ $Parameters["sku"] = $sku
 $Parameters["location"] = $location
 
 
-New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile ".\ARM-Template.json" -TemplateParameterObject $Parameters
+New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $TemplateFile -TemplateParameterObject $Parameters
 
 $ApplicationInsightName = "AppInsight-" + $webAppName
 $ApplicationInsight = Get-AzApplicationInsights -ResourceGroupName $ResourceGroupName -Name $ApplicationInsightName
 $InstrumentationKey = ConvertTo-SecureString -String $ApplicationInsight.InstrumentationKey -AsPlainText -Force
 $ConnectionString = ConvertTo-SecureString -String ("InstrumentationKey=" + $ApplicationInsight.InstrumentationKey) -AsPlainText -Force
-Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name 'InstrumentationKey' -SecretValue $InstrumentationKey
-Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name 'ConnectionStringToApplicationInsight' -SecretValue $ConnectionString
+Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name $KeyVaultSecretInstrumentationKey -SecretValue $InstrumentationKey
+Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name $KeyVaultSecretConnectionString -SecretValue $ConnectionString
 
 $WebAppName = $webAppName + "-webapp"
 New-OctopusAzureWebAppTarget -name "Azure Web Application" `
                              -azureWebApp $WebAppName `
                              -azureResourceGroupName $ResourceGroupName  `
-                             -octopusAccountIdOrName "Azure" `
-                             -octopusRoles "web" `
+                             -octopusAccountIdOrName  $octopusAccountIdOrName `
+                             -octopusRoles $octopusRoles `
                              -updateIfExisting
 
 #Remove Role Assignment
