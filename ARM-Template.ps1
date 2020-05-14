@@ -19,7 +19,8 @@ $Parameters = @{}
 $Parameters["webAppName"] = $webAppName
 $Parameters["sku"] = $sku
 $Parameters["location"] = $location
-
+$Parameters["appSettings"] = $appSettings
+$Parameters["connectionStrings"] = $connectionStrings
 
 New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $TemplateFile -TemplateParameterObject $Parameters
 
