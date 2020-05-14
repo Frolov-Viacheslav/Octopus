@@ -47,10 +47,16 @@ if($ObjectId){
 
 #New Role Assignment
 $WebAppId = (Get-AzWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName).Identity.PrincipalId
-New-AzRoleAssignment -ObjectId $WebAppId -RoleDefinitionName "Reader" -Scope $KeyVaultID
+$WebAppRole = $RoleAssignment | Where-Object{$_.ObjectId -eq $WebAppId}
+if(!$WebAppRole){
+    New-AzRoleAssignment -ObjectId $WebAppId -RoleDefinitionName "Reader" -Scope $KeyVaultID
+}
 
 #New Access Policy
-Set-AzKeyVaultAccessPolicy -VaultName $KeyVaultName -ObjectId $WebAppId -PermissionsToSecrets Get
+$WebAppAccessPolicy = $AccessPolicies | Where-Object{$_.ObjectId -eq $WebAppId}
+if(!$WebAppAccessPolicy){
+    Set-AzKeyVaultAccessPolicy -VaultName $KeyVaultName -ObjectId $WebAppId -PermissionsToSecrets Get
+}
 
 #Restart Web App
 Restart-AzWebApp -ResourceGroupName $ResourceGroupName -Name $WebAppName
