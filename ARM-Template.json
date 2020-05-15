@@ -24,10 +24,10 @@
         }
       },
       "appSettings": {
-        "type": "array"
+        "type": "string"
       },
       "connectionStrings": {
-        "type": "array"
+        "type": "string"
       }
     },
     "variables": {
@@ -60,8 +60,8 @@
         "properties": {
           "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
           "siteConfig": {
-          "appSettings": "[parameters('appSettings')]",
-          "connectionStrings": "[parameters('connectionStrings')]"
+          "appSettings": "[json(parameters('appSettings'))]",
+          "connectionStrings": "[json(parameters('connectionStrings'))]"
           }
         },
         "dependsOn": [
