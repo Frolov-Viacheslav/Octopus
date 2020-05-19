@@ -62,6 +62,7 @@ param (
     [String] $KeyVaultSecretConnectionString = "ConnectionStringToApplicationInsight",
     [String] $octopusAccountIdOrName = "Azure",
     [String] $octopusRoles = "web",
+    [String] $octopusTargetName = "Azure Web Application",
     [String] $appSettings = '[]',
     [String] $connectionStrings = '[]'
 
@@ -86,7 +87,7 @@ Set-AzKeyVaultSecret -VaultName $KeyVaultName -Name $KeyVaultSecretConnectionStr
 
 #Create Octopus deployment target
 $WebAppName = $webAppName + "-webapp"
-New-OctopusAzureWebAppTarget -name "Azure Web Application" `
+New-OctopusAzureWebAppTarget -name $octopusTargetName `
                              -azureWebApp $WebAppName `
                              -azureResourceGroupName $ResourceGroupName  `
                              -octopusAccountIdOrName  $octopusAccountIdOrName `
