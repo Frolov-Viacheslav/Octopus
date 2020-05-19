@@ -98,14 +98,14 @@ $KeyVaultID = (Get-AzKeyVault -Name $KeyVaultName).ResourceId
 $RoleAssignment = Get-AzRoleAssignment -Scope $KeyVaultID
 $Unknown = $RoleAssignment | Where-Object{$_.ObjectType -eq "Unknown"}
 if($Unknown){
-    Remove-AzRoleAssignment -ObjectId $Unknown.ObjectId -RoleDefinitionName $Unknown.RoleDefinitionName -Scope $KeyVaultID
+    $Unknown | ForEach-Object {Remove-AzRoleAssignment -ObjectId $_.ObjectId -RoleDefinitionName $_.RoleDefinitionName -Scope $KeyVaultID}
 }
 
 #Remove Access Policy
 $AccessPolicies = (Get-AzKeyVault -Name $KeyVaultName).AccessPolicies
 $ObjectId = ($AccessPolicies | Where-Object{$_.DisplayName -eq ""}).ObjectId
 if($ObjectId){
-    Remove-AzKeyVaultAccessPolicy -VaultName $KeyVaultName -ObjectId $ObjectId
+    $ObjectId | ForEach-Object {Remove-AzKeyVaultAccessPolicy -VaultName $KeyVaultName -ObjectId $_}
 }
 
 #New Role Assignment
